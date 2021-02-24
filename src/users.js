@@ -1,21 +1,17 @@
 import * as React from "react";
-import { Redirect } from 'react-router';
-import Button from '@material-ui/core/Button';
-import { ShowButton, TopToolbar, ListButton } from 'react-admin';
-import { List, Datagrid, TextField, EmailField, TextInput, Edit, SimpleForm, Create, DeleteWithConfirmButton, Toolbar, SaveButton, DeleteButton, EditButton } from 'react-admin';
-import { useHistory } from 'react-router-dom';
-import { withRouter } from 'react-router';
+import { List, Datagrid, TextField, EmailField, TextInput, Edit, SimpleForm, Create, Toolbar, SaveButton, DeleteButton, EditButton } from 'react-admin';
 import BackButton from './BackButton';
 import validator from 'validator';
 
-const validateUserCreation = (values) => {
+const validateUserCreation = ({name, email}) => {
+
   const errors = {};
-  if (!values.name) {
+  if (!name) {
       errors.name = ['Name is required'];
   }
-  if (!values.email) {
+  if (!email) {
       errors.email = ['Email is required'];
-  } else if (validator.isEmail(values.email) === false ) {
+  } else if (validator.isEmail(email) === false ) {
     errors.email = ['Please type correct email.'];
   }
   return errors
@@ -29,13 +25,15 @@ const UserEditToolbar = props => (
     </Toolbar>
 );
 
+
+
 export const UserList = props => (
-  <List {...props}>
+  <List {...props} bulkActionButtons={false}>
       <Datagrid rowClick="edit">
           <TextField source="id" />
           <TextField source="name" />
           <TextField source="username" />
-          <TextField source="address.city" />
+          <TextField label="City" source="address.city" />
           <EmailField source="email" />
           <EditButton />
           <DeleteButton mutationMode="optimistic" />
@@ -45,15 +43,15 @@ export const UserList = props => (
 
 export const UserEdit = props => (
     
-    <Edit {...props}>
+    <Edit  {...props}>
 
-        <SimpleForm validate={validateUserCreation} toolbar={<UserEditToolbar />}>
-            <TextInput source="id" />
+        <SimpleForm  validate={validateUserCreation} toolbar={<UserEditToolbar />}>
+            <TextInput disabled source="id" />
             <TextInput source="name" />
             <TextInput source="username" />
-            <TextInput source="address.city" />
+            <TextInput label="City" source="address.city" />
             <TextInput source="email" />
-        <BackButton>Cancel</BackButton>
+            <BackButton>Cancel</BackButton>
         </SimpleForm>
     </Edit>
     
@@ -61,12 +59,12 @@ export const UserEdit = props => (
 
 export const UserCreate = props => (
   <Create {...props} >
-      <SimpleForm validate={validateUserCreation} mutationMode="undoable">
-          <TextInput source="id" />
+      <SimpleForm redirect={() =>'/users'} validate={validateUserCreation} >
           <TextInput source="name"  />
           <TextInput source="username" />
-          <TextInput source="address.city" />
+          <TextInput label="City" source="address.city" />
           <TextInput source="email" />
+          <BackButton>Cancel</BackButton>
       </SimpleForm>
   </Create>
 );
